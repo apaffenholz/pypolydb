@@ -185,10 +185,20 @@ class PolyDBCollection():
     
     def count(self, filter : str|None = None) -> int:
         """
-        Returns the nubber of documents in the collection satisfying the filter
+        Returns the number of documents in the collection satisfying the filter
 
         :param filter: a dictionary that specifies the documents that should be counted
         :return: the number of documents in the collection satisfying the filter
         """
 
         return self._collection.count_documents(filter=filter)
+    
+    def id(self, id : str|None = None) -> dict :
+        """
+        Return the element with the given id
+
+        :param id: the id
+        :return: the element with the given id
+        """
+
+        return _sanitize_result(self._collection.find_one(filter={'_id': id}))
