@@ -9,8 +9,8 @@ class PolyDBCollection():
     :result: an instance of PolyDBCollection
     """
 
-    def __init__(self, db=None, collectionname=None):
-        if db and collectionname:
+    def __init__(self, db, collectionname=None):
+        if collectionname:
             self._collection = db[collectionname]
             self._db = db
             self._name = collectionname

@@ -22,9 +22,11 @@ class polyDB():
                      password='database', \
                      host='db.polymake.org', \
                      port=27017, \
-                     use_ssl=True):
+                     use_ssl=True,
+                     **kwargs):
 
-        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl)
+        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl, **kwargs)
+        print(self._client)
         self._db = self._client.polydb
 
     def _list_collection_names(self,filter : list|None =None) ->list:
