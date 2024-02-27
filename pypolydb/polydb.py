@@ -23,9 +23,10 @@ class polyDB():
                      host='db.polymake.org', \
                      port=27017, \
                      use_ssl=True,
+                     directConnection=True,
                      **kwargs):
 
-        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl, **kwargs)
+        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl, directConnection=directConnection, **kwargs)
         print(self._client)
         self._db = self._client.polydb
 
@@ -150,3 +151,4 @@ class polyDB():
             'description' : collection_info['description'],
         }
         return collection_info
+    

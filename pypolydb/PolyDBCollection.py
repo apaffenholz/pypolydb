@@ -1,5 +1,6 @@
 from .utilities import *
 from .PolyDBCursor import PolyDBCursor
+import json
 
 class PolyDBCollection():
     """
@@ -11,7 +12,10 @@ class PolyDBCollection():
 
     def __init__(self, db, collectionname=None):
         if collectionname:
+            info_collectionname = "_collectionInfo." + collectionname
+
             self._collection = db[collectionname]
+            self._infoCollection = db[info_collectionname]
             self._db = db
             self._name = collectionname
         else:
@@ -71,9 +75,9 @@ class PolyDBCollection():
             kwargs['projection'] = projection
 
         if skip != 0:
-            kwargs['skip'] = skip
+            kwargs['skip'] = int(skip)
 
-        return _sanitize_result(self._collection.find_one(filter=filter))
+        return _sanitize_result(self._collection.find_one(filter=filter, **kwargs ))
     
     def name(self) -> str:
         return self._collection.name
@@ -82,7 +86,7 @@ class PolyDBCollection():
              filter : list|None = None, \
              sort : list|None = None, \
              projection : list|None = None, \
-             skip : int = 0, \
+             skip = 0, \
              limit : int = 0, \
              batch_size : int = 0, \
              **kwargs) -> PolyDBCursor|None:
@@ -202,3 +206,54 @@ class PolyDBCollection():
         """
 
         return _sanitize_result(self._collection.find_one(filter={'_id': id}))
+
+    def schema(self) -> dict :
+        """
+        Return the schema describing an object in the collection
+        """
+
+        id = "schema.2.1"
+        filter = { "_id": id }
+        schema_doc = self._infoCollection.find_one( filter=filter )
+
+        schema_string =  json.dumps(schema_doc["schema"]).replace("__","$")
+        return json.loads(schema_string)
+
+    polymake_templated_types_one_argument = [ "Array", "Vector", "Serialized", "IncidenceMatrix", "Set", "Graph", "SparseVector" ]
+
+    polymake_templated_types_two_arguments = [ "Matrix", "Pair", "UniPolynomial", "HashMap", "Map", "Polynomial", "SparseMatrix" ]
+
+    def build_polymake_type(self, type : dict = None) -> str:
+      item = type.pop(0)
+      typedef = item
+      if item in self.polymake_templated_types_one_argument:
+        typedef += "<"
+        typedef += self.build_polymake_type(type)
+        typedef += ">"
+      elif item in self.polymake_templated_types_two_arguments:
+        typedef += "<"
+        typedef += self.build_polymake_type(type)
+        typedef += ","
+        typedef += self.build_polymake_type(type)
+        typedef += ">"
+
+      return typedef
+    
+
+    def type_of(self, property : str = None) -> str :
+      coll_schema = self.schema()
+      ref = None
+      if "allOf" in coll_schema:
+        ref = coll_schema["allOf"][0]["properties"][property]["$ref"]
+      else:  
+          ref = coll_schema["properties"][property]["$ref"]
+      path = ref.split("/", 3)
+      typedef = ""
+      if "description" in coll_schema["definitions"][path[2]]:
+        typedef = coll_schema["definitions"][path[2]]["description"]
+      else:
+        typedef = "polymake::"
+        type = path[2].split("-")
+        typedef += type.pop(0) + "::"
+        typedef += self.build_polymake_type(type)
+      return typedef
