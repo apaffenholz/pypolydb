@@ -2,6 +2,10 @@
 from pymongo import MongoClient
 import pprint
 import re
+try:
+    import sage.all as sage
+except:
+    None
 
 from .PolyDBCollection import PolyDBCollection
 
@@ -27,8 +31,15 @@ class polyDB():
                      **kwargs):
 
         self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl, directConnection=directConnection, **kwargs)
-        print(self._client)
+        try:
+            self._client.admin.command('ping')
+            print("connection to polydb established")
+        except ConnectionFailure:
+            print("polydb server not available")
         self._db = self._client.polydb
+
+    def _db(self):
+        return self._db
 
     def _list_collection_names(self,filter : list|None =None) ->list:
         """
@@ -82,14 +93,11 @@ class polyDB():
         filterstring_base = r"^_collectionInfo"
         if section is not None and section != "":
             filterstring_base += r"\." + section
-        filterstring = filterstring_base + r"\.[\w]+$"
+        filterstring = filterstring_base + r"\.[\w.]+$"
 
         collections = self._list_collection_names(filter=filterstring)
-        collections = list(map(lambda c: re.match(filterstring_base+r"\.([\w]+)$", c).group(1),collections))
+        collections = list(map(lambda c: re.match(filterstring_base+r"\.([\w.]+)$", c).group(1),collections))
         return collections
-
-    def _db(self):
-        return self._db
     
     def get_collection(self, collectionname : str) -> PolyDBCollection:
         """
