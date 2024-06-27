@@ -1,6 +1,7 @@
 from .utilities import *
 from .PolyDBCursor import PolyDBCursor
 import json
+import jsonschema
 
 class PolyDBCollection():
     """
@@ -77,7 +78,7 @@ class PolyDBCollection():
         if skip != 0:
             kwargs['skip'] = int(skip)
 
-        return _sanitize_result(self._collection.find_one(filter=filter, **kwargs ))
+        return _sanitize_result(self._collection.find_one(**kwargs ))
     
     def name(self) -> str:
         return self._collection.name
@@ -125,7 +126,31 @@ class PolyDBCollection():
 
         cur = self._collection.find(**kwargs)
         return PolyDBCursor(cur)
-    
+
+    def aggregate(self, \
+             pipeline : list|None = None, \
+             batch_size : int = 0, \
+             **kwargs) -> PolyDBCursor|None:
+        """
+        Return a curser over all elements in the collection matching the given conditions
+
+        :param pipeline: an aggregation pipeline
+        :param batch_size: specifies how many documents should be obtained in each call to the database
+        :return: a PolyDBCursor, or None if no document is found
+        """
+
+        if not kwargs:
+            kwargs = dict()
+
+        if pipeline is not None:
+            kwargs['pipeline'] = pipeline
+
+        if batch_size != 0:
+            kwargs['batch_size'] = batch_size
+
+        cur = self._collection.aggregate(**kwargs)
+        return PolyDBCursor(cur)
+
     def ids(self, \
             filter : list|None = None, \
             sort : list|None = None, \
