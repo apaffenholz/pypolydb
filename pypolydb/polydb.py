@@ -83,13 +83,14 @@ class polyDB():
 
         return sections
 
-    def collections_list(self,section : str|None =None) -> list: 
+    def collections_list(self,section : str|None = None) -> list: 
         """
         Obtain a list of collections in a section
         
         :param section: the name of the section
         :return: list of collections
         """
+
         filterstring_base = r"^_collectionInfo"
         if section is not None and section != "":
             filterstring_base += r"\." + section
@@ -132,7 +133,7 @@ class polyDB():
         }
         return info
 
-    def collections(self, collection : str = None) -> list:
+    def collection(self, collection : str = None) -> list:
         """
         Returns information about a collection
 
@@ -143,8 +144,8 @@ class polyDB():
         if collection is None or collection == "":
             return None
         
-        collection_coll = self._db['_collectionInfo'+collection]
-        data  = { '_id' : collection + '2.1' }
+        collection_coll = self._db['_collectionInfo.'+collection]
+        data  = { '_id' : collection + '.2.1' }
         collection_info = collection_coll.find_one(data)
 
         if collection_info is None:
