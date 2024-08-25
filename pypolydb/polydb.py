@@ -1,13 +1,13 @@
-
 from pymongo import MongoClient
-import pprint
 import re
+
 try:
     import sage.all as sage
-except:
-    None
+except ImportError:
+    pass
 
 from .PolyDBCollection import PolyDBCollection
+
 
 class polyDB():
     """
@@ -22,15 +22,17 @@ class polyDB():
     :return: a polyDB instance
     """
 
-    def __init__(self, username='polymake', \
-                     password='database', \
-                     host='db.polymake.org', \
-                     port=27017, \
-                     use_ssl=True,
-                     directConnection=True,
-                     **kwargs):
+    def __init__(self, username='polymake',
+                 password='database',
+                 host='db.polymake.org',
+                 port=27017,
+                 use_ssl=True,
+                 directConnection=True,
+                 **kwargs):
 
-        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port), tls=use_ssl, directConnection=directConnection, **kwargs)
+        self._client = MongoClient('mongodb://' + username + ':' + password + '@' + host + ':' + str(port),
+                                   tls=use_ssl, directConnection=directConnection,
+                                   **kwargs)
         try:
             self._client.admin.command('ping')
             print("connection to polydb established")
@@ -41,7 +43,7 @@ class polyDB():
     def _db(self):
         return self._db
 
-    def _list_collection_names(self,filter : list|None =None) ->list:
+    def _list_collection_names(self, filter: list | None = None) -> list:
         """
         wraps the list_collections_names command from mongo db
 
@@ -50,11 +52,12 @@ class polyDB():
         """
         query_filter = dict()
         if filter is not None:
-            query_filter = { "name" : { "$regex" : filter} }
-        return self._db.list_collection_names(filter=query_filter, authorizedCollections=True)
+            query_filter = {"name": {"$regex": filter}}
+        return self._db.list_collection_names(filter=query_filter,
+                                              authorizedCollections=True)
 
-    def subsections(self, section : str|None = None, recursive : bool =False) -> list:
-        """ 
+    def subsections(self, section: str | None = None, recursive: bool = False) -> list:
+        """
         Returns a list of all subsections of a given section (root if no section given).
 
         :param section: The name of the section
@@ -68,7 +71,7 @@ class polyDB():
         sections = self._list_collection_names(filter=filterstring)
         sections.sort()
         if not recursive:
-            sections = list(map(lambda s: re.match(filterstring+r"([\w]+)"+r".*", s).group(1),sections))
+            sections = list(map(lambda s: re.match(filterstring+r"([\w]+)"+r".*", s).group(1), sections))
         else:
             sections_array = list(map(lambda s: re.match(filterstring+r"(.*)", s).group(1), sections))
 
@@ -77,16 +80,16 @@ class polyDB():
                 sections_temp = sections
                 s = a.split(".")
                 for e in s:
-                    if not e in sections_temp:
+                    if e not in sections_temp:
                         sections_temp[e] = dict()
                     sections_temp = sections_temp[e]
 
         return sections
 
-    def collections_list(self,section : str|None = None) -> list: 
+    def collections_list(self, section: str | None = None) -> list:
         """
         Obtain a list of collections in a section
-        
+
         :param section: the name of the section
         :return: list of collections
         """
@@ -97,19 +100,19 @@ class polyDB():
         filterstring = filterstring_base + r"\.[\w.]+$"
 
         collections = self._list_collection_names(filter=filterstring)
-        collections = list(map(lambda c: re.match(filterstring_base+r"\.([\w.]+)$", c).group(1),collections))
+        collections = list(map(lambda c: re.match(filterstring_base+r"\.([\w.]+)$", c).group(1), collections))
         return collections
-    
-    def get_collection(self, collectionname : str) -> PolyDBCollection:
+
+    def get_collection(self, collectionname: str) -> PolyDBCollection:
         """
         Obtain a handle for a collection in polyDB
 
         :param collectionname: the name of the collection
         :return: an instance of PolyDBCollection
         """
-        return PolyDBCollection(self._db,collectionname)
-    
-    def section_info(self, section : str = None) -> list:
+        return PolyDBCollection(self._db, collectionname)
+
+    def section_info(self, section: str = None) -> list:
         """
         Returns information about a section
 
@@ -119,21 +122,21 @@ class polyDB():
         if section is None or section == "":
             return dict()
         section_coll = self._db['_sectionInfo.'+section]
-        data = { '_id' : section + '.2.1' }
+        data = {'_id': section + '.2.1'}
         section_info = section_coll.find_one(data)
         if section_info is None:
             print("No section with this name found")
             return None
         info = {
-            'maintainer' : section_info['maintainer'],
-            'description' : section_info['description'],
-            'sectionDepth' : section_info['sectionDepth'],
-            'sections' : self.subsections(section=section,recursive=False),
-            'collections' : self.collections_list(section=section)
+            'maintainer': section_info['maintainer'],
+            'description': section_info['description'],
+            'sectionDepth': section_info['sectionDepth'],
+            'sections': self.subsections(section=section, recursive=False),
+            'collections': self.collections_list(section=section)
         }
         return info
 
-    def collection(self, collection : str = None) -> list:
+    def collection(self, collection: str = None) -> list:
         """
         Returns information about a collection
 
@@ -143,9 +146,9 @@ class polyDB():
 
         if collection is None or collection == "":
             return None
-        
+
         collection_coll = self._db['_collectionInfo.'+collection]
-        data  = { '_id' : collection + '.2.1' }
+        data = {'_id': collection + '.2.1'}
         collection_info = collection_coll.find_one(data)
 
         if collection_info is None:
@@ -153,11 +156,10 @@ class polyDB():
             return None
 
         info = {
-            'author' : collection_info['author'],
-            'contributor' : collection_info['contributor'],
-            'maintainer' : collection_info['maintainer'],
-            'references' : collection_info['references'],
-            'description' : collection_info['description'],
+            'author': collection_info['author'],
+            'contributor': collection_info['contributor'],
+            'maintainer': collection_info['maintainer'],
+            'references': collection_info['references'],
+            'description': collection_info['description'],
         }
         return collection_info
-    
