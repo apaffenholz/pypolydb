@@ -1,9 +1,9 @@
+from .utilities import _sanitize_result
 
-from .utilities import *
 
-class PolyDBCursor() :
+class PolyDBCursor:
 
-    def __init__(self,cur):
+    def __init__(self, cur):
         self._cursor = cur
 
     def next(self):
@@ -14,6 +14,6 @@ class PolyDBCursor() :
 
     def __iter__(self):
         return self
-    
+
     def __next__(self):
-            return _sanitize_result(self._cursor.next())
+        return _sanitize_result(self._cursor.next())
