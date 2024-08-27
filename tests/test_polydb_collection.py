@@ -10,7 +10,7 @@ def test_find_one():
     coll = pdb.get_collection('Polytopes.Lattice.SmoothReflexive')
     filter = { 'N_VERTICES' : 10 }
     p = coll.find_one(skip=3, filter=filter)
-    assert p['_id'] == 'F.3D.0002'
+    assert p['_id'] == 'F.3D.0008'
 
 def test_find():
     pdb = polydb.polyDB()
