@@ -30,7 +30,7 @@ class PolyDBCollection():
         :return: list
         """
 
-        collection_coll = self._db['_collectionInfo.'+self._name]
+        collection_coll = self._db['_collectionInfo.' + self._name]
         data = {'_id': self._name + '.2.1'}
         collection_info = collection_coll.find_one(data)
 

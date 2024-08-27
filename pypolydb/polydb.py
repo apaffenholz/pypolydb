@@ -1,10 +1,6 @@
 from pymongo import MongoClient
+from pymongo import errors
 import re
-
-try:
-    import sage.all as sage
-except ImportError:
-    pass
 
 from .PolyDBCollection import PolyDBCollection
 
@@ -36,7 +32,7 @@ class polyDB():
         try:
             self._client.admin.command('ping')
             print("connection to polydb established")
-        except ConnectionFailure:
+        except errors.ConnectionFailure:
             print("polydb server not available")
         self._db = self._client.polydb
 
@@ -71,9 +67,9 @@ class polyDB():
         sections = self._list_collection_names(filter=filterstring)
         sections.sort()
         if not recursive:
-            sections = list(map(lambda s: re.match(filterstring+r"([\w]+)"+r".*", s).group(1), sections))
+            sections = list(map(lambda s: re.match(filterstring + r"([\w] + )" + r".*", s).group(1), sections))
         else:
-            sections_array = list(map(lambda s: re.match(filterstring+r"(.*)", s).group(1), sections))
+            sections_array = list(map(lambda s: re.match(filterstring + r"(.*)", s).group(1), sections))
 
             sections = dict()
             for a in sections_array:
@@ -100,7 +96,7 @@ class polyDB():
         filterstring = filterstring_base + r"\.[\w.]+$"
 
         collections = self._list_collection_names(filter=filterstring)
-        collections = list(map(lambda c: re.match(filterstring_base+r"\.([\w.]+)$", c).group(1), collections))
+        collections = list(map(lambda c: re.match(filterstring_base + r"\.([\w.]+)$", c).group(1), collections))
         return collections
 
     def get_collection(self, collectionname: str) -> PolyDBCollection:
@@ -121,7 +117,7 @@ class polyDB():
         """
         if section is None or section == "":
             return dict()
-        section_coll = self._db['_sectionInfo.'+section]
+        section_coll = self._db['_sectionInfo.' + section]
         data = {'_id': section + '.2.1'}
         section_info = section_coll.find_one(data)
         if section_info is None:
@@ -147,7 +143,7 @@ class polyDB():
         if collection is None or collection == "":
             return None
 
-        collection_coll = self._db['_collectionInfo.'+collection]
+        collection_coll = self._db['_collectionInfo.' + collection]
         data = {'_id': collection + '.2.1'}
         collection_info = collection_coll.find_one(data)
 
@@ -162,4 +158,4 @@ class polyDB():
             'references': collection_info['references'],
             'description': collection_info['description'],
         }
-        return collection_info
+        return info

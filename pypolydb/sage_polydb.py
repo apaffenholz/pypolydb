@@ -35,7 +35,9 @@ class polyDB(basePolyDB):
 
     def convert_affine(self, a, typename: str):
         """
-            Converts a polymake matrix type into a standard sage type while removing the first column (thus converting the homogeneous rep of polymake into an affine rep)
+            Converts a polymake matrix type into a standard sage type
+                while removing the first column
+                (thus converting the homogeneous rep of polymake into an affine rep)
 
             The typename must be given and cannot be infered from the data
             It can be obtained with get_type(<property name>) from the json schema of the collection
