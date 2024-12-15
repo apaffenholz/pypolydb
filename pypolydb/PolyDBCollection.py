@@ -3,7 +3,7 @@ from .PolyDBCursor import PolyDBCursor
 import json
 
 
-class PolyDBCollection():
+class PolyDBCollection:
     """
     A wrapper for a collection in PolyDB
 
@@ -191,13 +191,7 @@ class PolyDBCollection():
 
         kwargs['projection'] = {'_id': 1}
 
-        cur = self._collection.find(**kwargs)
-
-        ids = list()
-        for i in cur:
-            ids.append(i['_id'])
-
-        return ids
+        return [i['_id'] for i in self._collection.find(**kwargs)]
 
     def distinct(self, property: str = None, filter: dict | None = None) -> dict:
         """
