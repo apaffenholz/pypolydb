@@ -5,7 +5,7 @@ import re
 from .PolyDBCollection import PolyDBCollection
 
 
-class polyDB():
+class polyDB:
     """
     Wrapper for polyDB
 
