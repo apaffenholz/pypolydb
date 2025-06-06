@@ -38,14 +38,13 @@ class PolyDBCollection:
             print("No collection with this name found")
             return None
 
-        info = {
+        return {
             'author': collection_info['author'],
             'contributor': collection_info['contributor'],
             'maintainer': collection_info['maintainer'],
             'references': collection_info['references'],
             'description': collection_info['description'],
         }
-        return info
 
     def find_one(self,
                  filter: list | None = None,
@@ -64,7 +63,7 @@ class PolyDBCollection:
         """
 
         if not kwargs:
-            kwargs = dict()
+            kwargs = {}
 
         if filter is not None:
             kwargs['filter'] = filter
@@ -104,7 +103,7 @@ class PolyDBCollection:
         """
 
         if not kwargs:
-            kwargs = dict()
+            kwargs = {}
 
         if filter is not None:
             kwargs['filter'] = filter
@@ -140,7 +139,7 @@ class PolyDBCollection:
         """
 
         if not kwargs:
-            kwargs = dict()
+            kwargs = {}
 
         if pipeline is not None:
             kwargs['pipeline'] = pipeline
@@ -172,7 +171,7 @@ class PolyDBCollection:
         """
 
         if not kwargs:
-            kwargs = dict()
+            kwargs = {}
 
         if filter is not None:
             kwargs['filter'] = filter
@@ -202,7 +201,7 @@ class PolyDBCollection:
         :return: a list of distinct values for the property among all documents satisfying the filter
         """
         if property is None:
-            return dict()
+            return {}
 
         return self._collection.distinct(property, filter=filter)
 

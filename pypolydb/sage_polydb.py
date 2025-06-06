@@ -26,9 +26,8 @@ class polyDB(basePolyDB):
             if c < p:
                 f, s = t.split(",", 1)
                 return "polymake::common::" + f, "polymake::common::" + s
-            else:
-                f, s = self.split_complex_types(t)
-                return "polymake::common::" + f, "polymake::common::" + s
+            f, s = self.split_complex_types(t)
+            return "polymake::common::" + f, "polymake::common::" + s
         except ValueError:
             f, s = t.split(",")
             return "polymake::common::" + f, "polymake::common::" + s
@@ -56,40 +55,37 @@ class polyDB(basePolyDB):
             ring = typename.removeprefix('polymake::common::Matrix<').split(',')[0]
             if ring == 'Rational':
                 return sage.matrix(sage.QQ, len(a), len(a[0]), self._flatten(a))
-            elif ring == 'Integer' or ring == 'Int':
+            if ring == 'Integer' or ring == 'Int':
                 return sage.matrix(sage.ZZ, len(a), len(a[0]), self._flatten(a))
-            else:
-                print("unknown field in matrix: ", typename)
-                return None
+            print("unknown field in matrix: ", typename)
+            return None
 
-        elif typename.startswith('polymake::common::Vector'):
+        if typename.startswith('polymake::common::Vector'):
             ring = typename.removeprefix('polymake::common::Vector<')[:-1]
             if ring == 'Rational':
                 return sage.vector(sage.QQ, a)
-            elif ring == 'Integer' or ring == 'Int':
+            if ring == 'Integer' or ring == 'Int':
                 return sage.vector(sage.ZZ, a)
-            else:
-                print("unknown field in vector: ", type)
-                return None
+            print("unknown field in vector: ", type)
+            return None
 
-        elif typename.startswith('polymake::common::Integer'):
+        if typename.startswith('polymake::common::Integer'):
             return sage.ZZ(a)
-        elif typename.startswith('polymake::common::Rational'):
+        if typename.startswith('polymake::common::Rational'):
             return sage.QQ(a)
-        elif typename.startswith('polymake::common::Int'):
+        if typename.startswith('polymake::common::Int'):
             return int(a)
-        elif typename.startswith('polymake::common::Bool'):
+        if typename.startswith('polymake::common::Bool'):
             return bool(a)
-        elif typename.startswith('polymake::common::String'):
+        if typename.startswith('polymake::common::String'):
             return str(a)
-        elif typename.startswith('polymake::common::IncidenceMatrix'):
-            i = sage.IncidenceStructure(a[-1]['cols'], a[:len(a) - 1])
-            return i
-        elif typename.startswith('polymake::common::Array'):
+        if typename.startswith('polymake::common::IncidenceMatrix'):
+            return sage.IncidenceStructure(a[-1]['cols'], a[:len(a) - 1])
+        if typename.startswith('polymake::common::Array'):
             elementtype = "polymake::common::" + typename.removeprefix('polymake::common::Array<')[:-1]
-            l = [self.collections_listconvert(e, elementtype)
-                 for e in a]
-        elif typename.startswith('polymake::common::Set'):
+            return [self.collections_listconvert(e, elementtype)
+                    for e in a]
+        if typename.startswith('polymake::common::Set'):
             elementtype = "polymake::common::" + typename.removeprefix('polymake::common::Set<')[:-1]
             l = set()
             for e in a:
@@ -100,18 +96,15 @@ class polyDB(basePolyDB):
                 else:
                     l.add(ec)
             return l
-        elif typename.startswith('polymake::common::Map'):
+        if typename.startswith('polymake::common::Map'):
             elementtype_a, elementtype_b = self._split_type(typename.removeprefix('polymake::common::Map<')[:-1])
-            l = dict()
-            for i, j in a:
-                l[self.convert(i, elementtype_a)] = self.convert(j, elementtype_b)
-            return l
-        elif typename.startswith('polymake::common::Pair'):
+            return {self.convert(i, elementtype_a):
+                    self.convert(j, elementtype_b)
+                    for i, j in a}
+        if typename.startswith('polymake::common::Pair'):
             elementtype_a, elementtype_b = self._split_type(typename.removeprefix('polymake::common::Pair<')[:-1])
-            l = list()
-            l.append(self.convert(a[0], elementtype_a))
-            l.append(self.convert(a[1], elementtype_b))
-            return l
-        else:
-            print("unknown type: ", typename)
-            return None
+            return [self.convert(a[0], elementtype_a),
+                    self.convert(a[1], elementtype_b)]
+
+        print("unknown type: ", typename)
+        return None
