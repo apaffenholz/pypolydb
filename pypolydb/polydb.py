@@ -46,7 +46,7 @@ class polyDB:
         :param filter: filter for collection names
         :return: list of collection names
         """
-        query_filter = dict()
+        query_filter = {}
         if filter is not None:
             query_filter = {"name": {"$regex": filter}}
         return self._db.list_collection_names(filter=query_filter,
@@ -67,17 +67,17 @@ class polyDB:
         sections = self._list_collection_names(filter=filterstring)
         sections.sort()
         if not recursive:
-            sections = list(map(lambda s: re.match(filterstring + r"([\w] + )" + r".*", s).group(1), sections))
+            sections = [re.match(filterstring + r"([\w] + )" + r".*", s).group(1) for s in sections]
         else:
-            sections_array = list(map(lambda s: re.match(filterstring + r"(.*)", s).group(1), sections))
+            sections_array = [re.match(filterstring + r"(.*)", s).group(1) for s in sections]
 
-            sections = dict()
+            sections = {}
             for a in sections_array:
                 sections_temp = sections
                 s = a.split(".")
                 for e in s:
                     if e not in sections_temp:
-                        sections_temp[e] = dict()
+                        sections_temp[e] = {}
                     sections_temp = sections_temp[e]
 
         return sections
@@ -89,15 +89,14 @@ class polyDB:
         :param section: the name of the section
         :return: list of collections
         """
-
         filterstring_base = r"^_collectionInfo"
         if section is not None and section != "":
             filterstring_base += r"\." + section
         filterstring = filterstring_base + r"\.[\w.]+$"
 
         collections = self._list_collection_names(filter=filterstring)
-        collections = list(map(lambda c: re.match(filterstring_base + r"\.([\w.]+)$", c).group(1), collections))
-        return collections
+        return [re.match(filterstring_base + r"\.([\w.]+)$", c).group(1)
+                for c in collections]
 
     def get_collection(self, collectionname: str) -> PolyDBCollection:
         """
@@ -116,21 +115,20 @@ class polyDB:
         :return: list
         """
         if section is None or section == "":
-            return dict()
+            return {}
         section_coll = self._db['_sectionInfo.' + section]
         data = {'_id': section + '.2.1'}
         section_info = section_coll.find_one(data)
         if section_info is None:
             print("No section with this name found")
             return None
-        info = {
+        return {
             'maintainer': section_info['maintainer'],
             'description': section_info['description'],
             'sectionDepth': section_info['sectionDepth'],
             'sections': self.subsections(section=section, recursive=False),
             'collections': self.collections_list(section=section)
         }
-        return info
 
     def collection(self, collection: str = None) -> list:
         """
@@ -139,7 +137,6 @@ class polyDB:
         :param collection: the name of the collection
         :return: list
         """
-
         if collection is None or collection == "":
             return None
 
@@ -151,11 +148,10 @@ class polyDB:
             print("No collection with this name found")
             return None
 
-        info = {
+        return {
             'author': collection_info['author'],
             'contributor': collection_info['contributor'],
             'maintainer': collection_info['maintainer'],
             'references': collection_info['references'],
             'description': collection_info['description'],
         }
-        return info
