@@ -1,6 +1,7 @@
 from .utilities import _sanitize_result
 from .PolyDBCursor import PolyDBCursor
 import json
+from typing import Optional
 
 
 class PolyDBCollection:
@@ -27,7 +28,7 @@ class PolyDBCollection:
         Returns information about a collection
 
         :param collection: the name of the collection
-        :return: list
+        :return: dict
         """
 
         collection_coll = self._db['_collectionInfo.' + self._name]
@@ -35,8 +36,7 @@ class PolyDBCollection:
         collection_info = collection_coll.find_one(data)
 
         if collection_info is None:
-            print("No collection with this name found")
-            return None
+            raise ValueError("No collection with this name found")
 
         return {
             'author': collection_info['author'],
@@ -91,7 +91,7 @@ class PolyDBCollection:
              batch_size: int = 0,
              **kwargs) -> PolyDBCursor | None:
         """
-        Return a curser over all elements in the collection matching the given conditions
+        Return a cursor over all elements in the collection matching the given conditions
 
         :param filter: a filter document for the query
         :param sort: fix a specific sort order
@@ -192,7 +192,7 @@ class PolyDBCollection:
 
         return [i['_id'] for i in self._collection.find(**kwargs)]
 
-    def distinct(self, property: str = None, filter: dict | None = None) -> dict:
+    def distinct(self, property: Optional[str] = None, filter: dict | None = None) -> dict:
         """
         Returns a list of distinct values for the property among all documents satisfying the filter
 
@@ -249,7 +249,7 @@ class PolyDBCollection:
                                               "Polynomial",
                                               "SparseMatrix"]
 
-    def build_polymake_type(self, type: dict = None) -> str:
+    def build_polymake_type(self, type: Optional[dict] = None) -> str:
         item = type.pop(0)
         typedef = item
         if item in self.polymake_templated_types_one_argument:
@@ -265,7 +265,7 @@ class PolyDBCollection:
 
         return typedef
 
-    def type_of(self, property: str = None) -> str:
+    def type_of(self, property: Optional[str] = None) -> str:
         coll_schema = self.schema()
         ref = None
         if "allOf" in coll_schema:

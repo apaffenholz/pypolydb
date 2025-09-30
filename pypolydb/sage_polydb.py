@@ -4,7 +4,7 @@ from pypolydb.polydb import polyDB as basePolyDB
 
 class polyDB(basePolyDB):
 
-    def _flatten(self, list2d):
+    def _flatten(self, list2d) -> list:
         return [x for row in list2d for x in row]
 
     def split_complex_types(self, s: str):
@@ -17,9 +17,9 @@ class polyDB(basePolyDB):
             elif c == '>':
                 paren_count[paren_stack.pop()] = i
             if len(paren_stack) == 0:
-                return s[0, paren_count[0]], s[paren_count[0] + 2:]
+                return s[:paren_count[0]], s[paren_count[0] + 2:]
 
-    def _split_type(self, t: str = None):
+    def _split_type(self, t: str):
         try:
             p = t.index("<")
             c = t.index(",")
@@ -38,7 +38,7 @@ class polyDB(basePolyDB):
                 while removing the first column
                 (thus converting the homogeneous rep of polymake into an affine rep)
 
-            The typename must be given and cannot be infered from the data
+            The typename must be given and cannot be inferred from the data
             It can be obtained with get_type(<property name>) from the json schema of the collection
         """
         M = self.convert(a, typename)
@@ -48,7 +48,7 @@ class polyDB(basePolyDB):
         """
             Converts a polymake type into a standard sage type
 
-            The typename must be given and cannot be infered from the data
+            The typename must be given and cannot be inferred from the data
             It can be obtained with get_type(<property name>) from the json schema of the collection
         """
         if typename.startswith('polymake::common::Matrix'):
