@@ -3,6 +3,7 @@ from pymongo import errors
 import re
 
 from .PolyDBCollection import PolyDBCollection
+from typing import Optional
 
 
 class polyDB:
@@ -107,7 +108,7 @@ class polyDB:
         """
         return PolyDBCollection(self._db, collectionname)
 
-    def section_info(self, section: str = None) -> list:
+    def section_info(self, section: Optional[str] = None) -> list:
         """
         Returns information about a section
 
@@ -130,7 +131,7 @@ class polyDB:
             'collections': self.collections_list(section=section)
         }
 
-    def collection(self, collection: str = None) -> list:
+    def collection(self, collection: Optional[str] = None) -> list:
         """
         Returns information about a collection
 
