@@ -87,15 +87,15 @@ class polyDB(basePolyDB):
                     for e in a]
         if typename.startswith('polymake::common::Set'):
             elementtype = "polymake::common::" + typename.removeprefix('polymake::common::Set<')[:-1]
-            l = set()
+            l_set = set()
             for e in a:
                 ec = self.convert(e, elementtype)
                 print(type(ec))
                 if isinstance(ec, list):
-                    l.add(tuple(ec))
+                    l_set.add(tuple(ec))
                 else:
-                    l.add(ec)
-            return l
+                    l_set.add(ec)
+            return l_set
         if typename.startswith('polymake::common::Map'):
             elementtype_a, elementtype_b = self._split_type(typename.removeprefix('polymake::common::Map<')[:-1])
             return {self.convert(i, elementtype_a):
