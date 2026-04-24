@@ -108,12 +108,12 @@ class polyDB:
         """
         return PolyDBCollection(self._db, collectionname)
 
-    def section_info(self, section: Optional[str] = None) -> list:
+    def section_info(self, section: Optional[str] = None) -> dict | None:
         """
         Returns information about a section
 
         :param section: the name of the section
-        :return: list
+        :return: dict
         """
         if section is None or section == "":
             return {}
@@ -131,12 +131,12 @@ class polyDB:
             'collections': self.collections_list(section=section)
         }
 
-    def collection(self, collection: Optional[str] = None) -> list:
+    def collection(self, collection: Optional[str] = None) -> dict | None:
         """
         Returns information about a collection
 
         :param collection: the name of the collection
-        :return: list
+        :return: dict
         """
         if collection is None or collection == "":
             return None

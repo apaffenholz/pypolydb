@@ -250,6 +250,8 @@ class PolyDBCollection:
                                               "SparseMatrix"]
 
     def build_polymake_type(self, type: Optional[dict] = None) -> str:
+        if type is None:
+            raise ValueError
         item = type.pop(0)
         typedef = item
         if item in self.polymake_templated_types_one_argument:
