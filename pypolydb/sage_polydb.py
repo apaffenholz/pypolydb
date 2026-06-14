@@ -1,4 +1,5 @@
 import sage.all as sage
+
 from pypolydb.polydb import polyDB as basePolyDB
 
 
@@ -16,7 +17,7 @@ class polyDB(basePolyDB):
                 paren_stack.append(i)
             elif c == '>':
                 paren_count[paren_stack.pop()] = i
-            if len(paren_stack) == 0:
+            if not paren_stack:
                 return s[:paren_count[0]], s[paren_count[0] + 2:]
 
     def _split_type(self, t: str):
@@ -34,22 +35,26 @@ class polyDB(basePolyDB):
 
     def convert_affine(self, a, typename: str):
         """
-            Converts a polymake matrix type into a standard sage type
-                while removing the first column
-                (thus converting the homogeneous rep of polymake into an affine rep)
+        Convert a polymake matrix type into a standard sage type
+        while removing the first column.
 
-            The typename must be given and cannot be inferred from the data
-            It can be obtained with get_type(<property name>) from the json schema of the collection
+        This is therefore converting the homogeneous rep of polymake
+        into an affine rep.
+
+        The typename must be given and cannot be inferred from the data.
+        It can be obtained with ``get_type(<property name>)`` from the json
+        schema of the collection.
         """
         M = self.convert(a, typename)
         return M[range(M.nrows()), range(1, M.ncols())]
 
     def convert(self, a, typename: str):
         """
-            Converts a polymake type into a standard sage type
+        Convert a polymake type into a standard sage type.
 
-            The typename must be given and cannot be inferred from the data
-            It can be obtained with get_type(<property name>) from the json schema of the collection
+        The typename must be given and cannot be inferred from the data.
+        It can be obtained with ``get_type(<property name>)`` from the json
+        schema of the collection.
         """
         if typename.startswith('polymake::common::Matrix'):
             ring = typename.removeprefix('polymake::common::Matrix<').split(',')[0]

@@ -1,12 +1,12 @@
-from .utilities import _sanitize_result
-from .PolyDBCursor import PolyDBCursor
 import json
-from typing import Optional
+
+from .PolyDBCursor import PolyDBCursor
+from .utilities import _sanitize_result
 
 
 class PolyDBCollection:
     """
-    A wrapper for a collection in PolyDB
+    A wrapper for a collection in PolyDB.
 
     :param collectioname: name of the collection
     :result: an instance of PolyDBCollection
@@ -25,12 +25,11 @@ class PolyDBCollection:
 
     def info(self) -> dict:
         """
-        Returns information about a collection
+        Return information about a collection.
 
         :param collection: the name of the collection
         :return: dict
         """
-
         collection_coll = self._db['_collectionInfo.' + self._name]
         data = {'_id': self._name + '.2.1'}
         collection_info = collection_coll.find_one(data)
@@ -53,7 +52,7 @@ class PolyDBCollection:
                  skip: int = 0,
                  **kwargs) -> list | None:
         """
-        Find one element in the collection
+        Find one element in the collection.
 
         :param filter: a filter document for the query
         :param sort: fix a specific sort order
@@ -61,7 +60,6 @@ class PolyDBCollection:
         :param skip: specifies how many documents should be skipped at the beginning of the result set
         :return: a document from the database, or None if no document is found
         """
-
         if not kwargs:
             kwargs = {}
 
@@ -91,7 +89,7 @@ class PolyDBCollection:
              batch_size: int = 0,
              **kwargs) -> PolyDBCursor | None:
         """
-        Return a cursor over all elements in the collection matching the given conditions
+        Return a cursor over all elements in the collection matching the given conditions.
 
         :param filter: a filter document for the query
         :param sort: fix a specific sort order
@@ -101,7 +99,6 @@ class PolyDBCollection:
         :param batch_size: specifies how many documents should be obtained in each call to the database
         :return: a PolyDBCursor, or None if no document is found
         """
-
         if not kwargs:
             kwargs = {}
 
@@ -131,13 +128,12 @@ class PolyDBCollection:
                   batch_size: int = 0,
                   **kwargs) -> PolyDBCursor | None:
         """
-        Return a cursor over all elements in the collection matching the given conditions
+        Return a cursor over all elements in the collection matching the given conditions.
 
         :param pipeline: an aggregation pipeline
         :param batch_size: specifies how many documents should be obtained in each call to the database
         :return: a PolyDBCursor, or None if no document is found
         """
-
         if not kwargs:
             kwargs = {}
 
@@ -158,8 +154,7 @@ class PolyDBCollection:
             batch_size: int = 0,
             **kwargs) -> list:
         """
-        Return an array of all ids of all elements matching the given conditions
-
+        Return an array of ids of all elements matching the given conditions.
 
         :param filter: a filter document for the query
         :param sort: fix a specific sort order
@@ -169,7 +164,6 @@ class PolyDBCollection:
         :param batch_size: specifies how many documents should be obtained in each call to the database
         :return: a list of all ids whose documents satisfy the query
         """
-
         if not kwargs:
             kwargs = {}
 
@@ -192,9 +186,9 @@ class PolyDBCollection:
 
         return [i['_id'] for i in self._collection.find(**kwargs)]
 
-    def distinct(self, property: Optional[str] = None, filter: dict | None = None) -> dict:
+    def distinct(self, property: str | None = None, filter: dict | None = None) -> dict:
         """
-        Returns a list of distinct values for the property among all documents satisfying the filter
+        Return a list of distinct values for the property among all documents satisfying the filter.
 
         :param property: the property for which the distinct values should be returned
         :param filter: a dictionary that specifies the documents that should be considered
@@ -207,29 +201,26 @@ class PolyDBCollection:
 
     def count(self, filter: str | None = None) -> int:
         """
-        Returns the number of documents in the collection satisfying the filter
+        Return the number of documents in the collection satisfying the filter.
 
         :param filter: a dictionary that specifies the documents that should be counted
         :return: the number of documents in the collection satisfying the filter
         """
-
         return self._collection.count_documents(filter=filter)
 
     def id(self, id: str | None = None) -> dict:
         """
-        Return the element with the given id
+        Return the element with the given id.
 
         :param id: the id
         :return: the element with the given id
         """
-
         return _sanitize_result(self._collection.find_one(filter={'_id': id}))
 
     def schema(self) -> dict:
         """
-        Return the schema describing an object in the collection
+        Return the schema describing an object in the collection.
         """
-
         id = "schema.2.1"
         filter = {"_id": id}
         schema_doc = self._infoCollection.find_one(filter=filter)
@@ -249,7 +240,7 @@ class PolyDBCollection:
                                               "Polynomial",
                                               "SparseMatrix"]
 
-    def build_polymake_type(self, type: Optional[dict] = None) -> str:
+    def build_polymake_type(self, type: dict | None = None) -> str:
         if type is None:
             raise ValueError
         item = type.pop(0)
@@ -267,7 +258,7 @@ class PolyDBCollection:
 
         return typedef
 
-    def type_of(self, property: Optional[str] = None) -> str:
+    def type_of(self, property: str | None = None) -> str:
         coll_schema = self.schema()
         ref = None
         if "allOf" in coll_schema:
