@@ -1,9 +1,8 @@
-from pymongo import MongoClient
-from pymongo import errors
 import re
 
+from pymongo import MongoClient, errors
+
 from .PolyDBCollection import PolyDBCollection
-from typing import Optional
 
 
 class polyDB:
@@ -42,7 +41,7 @@ class polyDB:
 
     def _list_collection_names(self, filter: list | None = None) -> list:
         """
-        wraps the list_collections_names command from mongo db
+        Wrap the list_collections_names command from mongo db.
 
         :param filter: filter for collection names
         :return: list of collection names
@@ -55,7 +54,7 @@ class polyDB:
 
     def subsections(self, section: str | None = None, recursive: bool = False) -> list:
         """
-        Returns a list of all subsections of a given section (root if no section given).
+        Return a list of all subsections of a given section (root if no section given).
 
         :param section: The name of the section
         :param recursive: default False, if true will recursively return the names of all subsections as well
@@ -85,7 +84,7 @@ class polyDB:
 
     def collections_list(self, section: str | None = None) -> list:
         """
-        Obtain a list of collections in a section
+        Obtain a list of collections in a section.
 
         :param section: the name of the section
         :return: list of collections
@@ -101,16 +100,16 @@ class polyDB:
 
     def get_collection(self, collectionname: str) -> PolyDBCollection:
         """
-        Obtain a handle for a collection in polyDB
+        Obtain a handle for a collection in polyDB.
 
         :param collectionname: the name of the collection
         :return: an instance of PolyDBCollection
         """
         return PolyDBCollection(self._db, collectionname)
 
-    def section_info(self, section: Optional[str] = None) -> dict | None:
+    def section_info(self, section: str | None = None) -> dict | None:
         """
-        Returns information about a section
+        Return information about a section.
 
         :param section: the name of the section
         :return: dict
@@ -131,9 +130,9 @@ class polyDB:
             'collections': self.collections_list(section=section)
         }
 
-    def collection(self, collection: Optional[str] = None) -> dict | None:
+    def collection(self, collection: str | None = None) -> dict | None:
         """
-        Returns information about a collection
+        Return information about a collection.
 
         :param collection: the name of the collection
         :return: dict
